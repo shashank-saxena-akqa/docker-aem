@@ -1,0 +1,24 @@
+# Start from an apache httpd image
+FROM httpd:2.4
+
+# Set default directory
+WORKDIR /usr/src/app
+
+RUN apt-get update && apt-get install -y procps
+# Download the dispatcher from adobe's page
+# ADD dispatcher-apache2.4-linux-x86_64-ssl-4.3.2.tar.gz  ./dispatcher
+
+# Unzip and copy the module into apache's modules folder
+# RUN cp ./dispatcher/dispatcher-apache2.4-4.3.2.so /usr/local/apache2/modules/mod_dispatcher.so
+ADD /modules/* /usr/local/apache2/modules/
+
+RUN cd /usr/local/apache2/modules/ && ls -all
+
+
+# Copy a default dispatcher configuration
+ADD dispatcher.any /usr/local/apache2/conf/dispatcher.any
+
+# Replace the httpd.conf file with one that already has the dispatcher configured
+COPY httpd.conf /usr/local/apache2/conf/httpd.conf
+
+RUN apachectl configtest
